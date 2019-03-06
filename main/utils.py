@@ -29,4 +29,4 @@ def scan_site(name, url):
     resp = requests.get(url)
     
     if name == 'Attack on Titan':
-        return resp.text.count('img') > 100
+        return resp.text.count('img') > 20
