@@ -8,7 +8,7 @@ def dispatch_notifications():
     for manga in Manga.objects.all():
         
         released = scan_site(manga.name, manga.url)
-        
+        print(manga.name, 'Released:', released)
         if released:
             
             manga.upcoming_chapter += 1

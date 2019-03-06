@@ -21,7 +21,8 @@ def send_email(email, subject, body):
         return True
     
     except Exception as e:
-        
+        print('Email error')
+        print(e)
         return 'Email sending failed'
     
 def scan_site(name, url):
@@ -29,4 +30,5 @@ def scan_site(name, url):
     resp = requests.get(url)
     
     if name == 'Attack on Titan':
+        print('Count:', resp.text.count('img'))
         return resp.text.count('img') > 20
