@@ -10,7 +10,7 @@ def send_email(email, subject, body):
         os.environ['SENDGRID_API_KEY'] = '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'
         sg = sendgrid.SendGridAPIClient(apikey=os.environ.get('SENDGRID_API_KEY'))
 
-        from_email = Email("do_not_reply@manga-notification-squad.herokuapp.com")
+        from_email = Email("do_not_reply@herokuapp.com")
         to_email = Email(email)
 
         content = Content("text/plain", body)
