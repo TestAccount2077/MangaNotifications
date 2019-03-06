@@ -1,0 +1,191 @@
+<html>
+    
+    <head>
+        
+        <link href="https://fonts.googleapis.com/css?family=Acme|Rock+Salt" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/izitoast/1.4.0/css/iziToast.css">
+        
+        <style>
+            
+            * {
+                font-family: 'Acme', sans-serif;
+                outline: 0
+            }
+            
+            a {
+                text-decoration: none;
+            }
+            
+            a:visited {
+                color: black
+            }
+            
+            #manga-container {
+                margin-top: 50px;
+                width: 80%;
+                margin-left: 10%;
+            }
+            
+            #header {
+                font-family: 'Rock Salt', cursive;
+                text-align: center;
+                margin-top: 30px;
+            }
+            
+            #email {
+                width: 80%;
+                display: inline-block;
+                height: 50px;
+                padding: 15px;
+                margin-left: 10%;
+                border-radius: 10px;
+                border: 1px solid #aaa;
+            }
+            
+            #subscribe-btn {
+                margin-left: 43%;
+                width: 10%;
+                height: 50px;
+                border-radius: 10px;
+                background-color: #1f861f;
+                color: white;
+                font-size: 18px;
+                margin-top: 50px;
+                cursor: pointer;
+                border: none;
+            }
+            
+            #subscribe-btn:hover {
+                box-shadow: 0px 3px 5px #1c691c;
+                transition: box-shadow 0.1s ease-in-out;
+            }
+            
+            #subscribe-btn:active {
+                box-shadow: inset 0px 0px 3px 2px #2a6b30;
+                background-color: #165d16
+            }
+            
+        </style>
+    </head>
+    
+    <body>
+        
+        <h1 id="header">Manga Notification Squad&trade;</h1>
+        <input type="email" id="email" placeholder="Email">
+        
+        <div id="manga-container">
+        {% for manga in mangas %}
+            <input type="checkbox" id="{{ manga.name }}" class="manga-check">
+            <label for="{{ manga.name }}"><a href="{{ manga.url }}" target="_blank">{{ manga.name }}</a></label>
+        {% endfor %}
+        </div>
+        
+        <button id="subscribe-btn">SUBSCRIBE</button>
+        
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/izitoast/1.4.0/js/iziToast.min.js"></script>
+        
+        <script type="text/javascript">
+            
+            function notify(type, message) {
+
+                var data = {
+                    title: capitalize(type),
+                    message,
+                    position: 'topRight',
+                    zindex: 99999
+                }
+
+                if (type === 'error') {
+                    iziToast.error(data);
+                }
+
+                else if (type === 'warning') {
+                    iziToast.warning(data);
+                }
+
+                else if (type === 'info') {
+                    iziToast.info(data);
+                }
+
+                else if (type === 'success') {
+                    iziToast.success(data);
+                }
+
+            }
+            
+            function generateAlerts(error) {
+
+                'use strict';
+
+                var data,
+                    message = '';
+
+                if (error.status === 400 || error.status === 403) {
+
+                    data = error.responseJSON;
+
+                    $.each(data, function (e, errorMessage) {
+                        message += '&bull; ' + errorMessage + '<br>';
+                    });
+
+                    notify('error', message);
+
+                } else if (error.status === 500) {
+                    notify('error', 'Something went wrong. Please try again');
+                }
+            }
+            
+            function capitalize(string) {
+                return string.charAt(0).toUpperCase() + string.slice(1);
+            }
+        </script>
+        
+        <script type="text/javascript">
+            
+            $(document).on('click', '#subscribe-btn', function () {
+                
+                var email = $('#email').val(),
+                    mangas = $('.manga-check:checked');
+                
+                if (!email) {
+                    notify('error', 'Please enter an email to proceed');
+                    return;
+                }
+                
+                /*if (!mangas.length) {
+                    notify('error', 'Please select at least one manga to subscribe to');
+                    return;
+                }*/
+                
+                var mangaNames = [];
+                
+                mangas.each(function () {
+                    mangaNames.push($(this).attr('id'));
+                });
+                
+                $.ajax({
+                    
+                    url: '/ajax/register-email/',
+                    
+                    data: {
+                        email,
+                        mangas: JSON.stringify(mangaNames)
+                    },
+                    
+                    success: function (data) {
+                        
+                        var verb = data.created ? 'registered' : 'updated';
+                        
+                        notify('success', `Email ${ verb } successfully`);
+                        
+                    },
+                    
+                    error: generateAlerts
+                });
+            });
+        
+        </script>
+        
+    </body>
+</html>
