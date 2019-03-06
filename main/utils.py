@@ -7,7 +7,7 @@ from sendgrid.helpers.mail import *
 def send_email(email, subject, body):
     
     try:
-        os.environ['SENDGRID_API_KEY'] = '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'
+        
         sg = sendgrid.SendGridAPIClient(apikey=os.environ.get('SENDGRID_API_KEY'))
 
         from_email = Email("do_not_reply@herokuapp.com")
